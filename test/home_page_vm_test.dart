@@ -1,4 +1,7 @@
-import 'package:flutter_mvvm/home/home_page_vm.dart';
+import 'dart:async';
+
+import 'package:flutter_mvvm/mvvm/app_routes.dart';
+import 'package:flutter_mvvm/pages/home/home_page_vm.dart';
 import 'package:test/test.dart';
 
 void main() {
@@ -82,6 +85,26 @@ void main() {
       expect(state.count, 0);
       expect(state.isMinusEnabled, false);
       expect(state.isPlusEnabled, true);
+
+      viewModel.dispose();
+    });
+
+    test('secondPageButtonTapped pushes second page', () async {
+      // Set count to one
+      viewModel.plusButtonTapped();
+      final state = await viewModel.state.first;
+
+      expect(state.count, 1);
+      expect(state.isMinusEnabled, true);
+      expect(state.isPlusEnabled, true);
+
+      // delay execution so the event it caught by the Routes Publish
+      scheduleMicrotask(viewModel.secondPageButtonTapped);
+      final route = await viewModel.routes.first;
+
+      expect(route.name, '/second');
+      expect(route.action, AppRouteAction.pushTo);
+      expect(route.arguments, {'count': 1});
 
       viewModel.dispose();
     });

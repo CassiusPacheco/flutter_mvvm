@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_mvvm/mvvm/app_routes.dart';
 import 'package:flutter_mvvm/mvvm/view_model.abs.dart';
 import 'package:logging/logging.dart';
 
@@ -34,6 +37,46 @@ abstract class ViewState<V extends View, VM extends ViewModel> extends State<V>
   void initState() {
     super.initState();
     viewModel.init();
+  }
+
+  /// Listens to the stream and automatically routes users according to the
+  /// route spec.
+  StreamSubscription<AppRouteSpec> listenToRoutesSpecs(
+    Stream<AppRouteSpec> routes,
+  ) {
+    return routes.listen((spec) async {
+      switch (spec.action) {
+        case AppRouteAction.pushTo:
+          await Navigator.of(context).pushNamed(
+            spec.name,
+            arguments: spec.arguments,
+          );
+          break;
+        case AppRouteAction.replaceWith:
+          await Navigator.of(context).pushReplacementNamed(
+            spec.name,
+            arguments: spec.arguments,
+          );
+          break;
+        case AppRouteAction.replaceAllWith:
+          await Navigator.of(context).pushNamedAndRemoveUntil(
+            spec.name,
+            (route) => false,
+            arguments: spec.arguments,
+          );
+          break;
+        case AppRouteAction.pop:
+          Navigator.of(context).pop();
+          break;
+        case AppRouteAction.popUntil:
+          Navigator.of(context)
+              .popUntil((route) => route.settings.name == spec.name);
+          break;
+        case AppRouteAction.popUntilRoot:
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          break;
+      }
+    });
   }
 
   @mustCallSuper

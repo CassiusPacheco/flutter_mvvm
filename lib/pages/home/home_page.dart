@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_mvvm/home/home_page_vm.dart';
 import 'package:flutter_mvvm/mvvm/view.abs.dart';
+import 'package:flutter_mvvm/pages/home/home_page_vm.dart';
 import 'package:flutter_mvvm/ui_components/app_button.dart';
 
 class HomePage extends View<HomePageViewModel> {
-  // We're instantiating the HomePageViewModel directly here for now. In the
-  // next part of this series it's going to change
-  HomePage({Key? key}) : super.model(HomePageViewModel(), key: key);
+  const HomePage({required HomePageViewModel viewModel, Key? key})
+      : super.model(viewModel, key: key);
 
   @override
   _HomePageState createState() => _HomePageState(viewModel);
@@ -14,6 +13,12 @@ class HomePage extends View<HomePageViewModel> {
 
 class _HomePageState extends ViewState<HomePage, HomePageViewModel> {
   _HomePageState(HomePageViewModel viewModel) : super(viewModel);
+
+  @override
+  void initState() {
+    super.initState();
+    listenToRoutesSpecs(viewModel.routes);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +76,18 @@ class _HomePageState extends ViewState<HomePage, HomePageViewModel> {
                           ),
                         ),
                       ],
-                    )
+                    ),
+                    const SizedBox(height: 32),
+                    AppButton(
+                      onTap: viewModel.secondPageButtonTapped,
+                      child: Text(
+                        'Go to second page',
+                        style: Theme.of(context)
+                            .textTheme
+                            .button
+                            ?.copyWith(color: Colors.blue),
+                      ),
+                    ),
                   ],
                 ),
               ),
