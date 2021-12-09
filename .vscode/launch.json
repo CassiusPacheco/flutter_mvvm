@@ -7,7 +7,8 @@
         {
             "name": "flutter_mvvm",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "program": "app/lib/main.dart"
         },
         {
             "name": "flutter_mvvm (profile mode)",

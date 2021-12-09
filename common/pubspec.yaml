@@ -1,11 +1,11 @@
-name: flutter_mvvm
-description: An example of MVVM in Flutter
-
+name: common
+description: Common code to all packages and apps
+version: 0.0.1
 publish_to: 'none'
-version: 1.0.0+1
 
 environment:
   sdk: ">=2.13.0 <3.0.0"
+  flutter: ">=1.17.0"
 
 dependencies:
   flutter:
@@ -14,9 +14,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
-  test: ^1.15.7
   flutter_lints: ^1.0.0
 
 flutter:
-  uses-material-design: true

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo "Importing $1 files for coverage"
+outputFile="$1/test/coverage_test.dart"
+packageName=$1
+
+if [ "$packageName" = "" ]; then
+    echo "Run $0 from the root of your Dart/Flutter project"
+    exit 1
+fi
+
+echo "/// *** GENERATED FILE - ANY CHANGES WOULD BE OBSOLETE ON NEXT GENERATION *** ///\n" > "$outputFile"
+echo "/// Helper to test coverage for all project files" >> "$outputFile"
+echo "// ignore_for_file: unused_import" >> "$outputFile"
+find $packageName/lib -name '*.dart' | grep -v '.g.dart' | grep -v '**/app/adaptors/*' | grep -v '**/adaptors/*' | grep -v '.gr.dart' | grep -v '.abs.dart' | grep -v 'generated_plugin_registrant' | sort | awk -v package=$packageName '{gsub(package"/lib", "")1; printf("import '\''package:%s%s'\'';\n", package, $1);}'  >> "$outputFile"
+echo "\nvoid main() {}" >> "$outputFile"

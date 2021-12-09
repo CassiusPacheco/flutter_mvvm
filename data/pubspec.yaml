@@ -1,0 +1,30 @@
+name: data
+description: Data layer
+version: 0.0.1
+publish_to: 'none'
+
+environment:
+  sdk: ">=2.13.0 <3.0.0"
+  flutter: ">=1.17.0"
+
+dependencies:
+  rxdart: ^0.27.3
+
+  flutter:
+    sdk: flutter
+
+  common:
+    path: ../common
+
+  entities:
+    path: ../entities
+
+  domain:
+    path: ../domain
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+
+flutter:

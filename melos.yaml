@@ -1,0 +1,168 @@
+name: flutter_mvvm
+
+packages:
+  - app/*
+  - common/*
+  - design_system/*
+  - entities/*
+  - data/*
+  - domain/*
+  - clients/*
+
+scripts:
+  setupcoverage:
+    run: |
+      ./dart-coverage-helper app
+      ./dart-coverage-helper common
+      ./dart-coverage-helper data
+      ./dart-coverage-helper domain
+      ./dart-coverage-helper clients
+    description: Creates a coverage_test.dart file that imports all files from the package
+
+  cleanupcoverage:
+    run: |
+      rm app/test/coverage_test.dart
+      rm common/test/coverage_test.dart
+      rm data/test/coverage_test.dart
+      rm domain/test/coverage_test.dart
+      rm clients/test/coverage_test.dart
+    description: Deletes coverage_test.dart files from the packages
+
+  get:
+    run: |
+      flutter pub get # Gets packages in the root folder first
+      melos exec -c 1 --fail-fast --no-flutter -- \
+        pub get
+      melos exec -c 1 --fail-fast --flutter -- \
+        flutter pub get
+    description: Run `pub get` in all the packages
+
+  clean:
+    run: |
+      flutter clean # Clean root folder first
+      melos exec flutter clean
+    description: Run `flutter clean` in all the packages
+
+  analyze:
+    run: |
+      melos exec --since="origin/main" --fail-fast -- \
+        dart analyze .
+    description: |
+      Run `dart analyze` in all packages.
+       - Note: you can also rely on your IDEs Dart Analysis / Issues window.
+
+  format:
+    run: dart format .
+    description: Formats all the code
+
+  ## TESTING DIFF FROM MAIN BRANCH
+
+  difftest:flutter:
+    run: |
+      melos exec --since="origin/main" --fail-fast  --dir-exists="test" --depends-on="flutter_test" --flutter -- \
+        "flutter test --no-pub --machine > tests.json"
+    description: Run `flutter test` for flutter packages based on a diff from origin/main
+
+  difftest:dart:
+    run: |
+      melos exec --since="origin/main" --fail-fast --dir-exists="test"  --depends-on="test" --no-flutter -- \
+        "dart test --file-reporter=json:tests.json"
+    description: Run `dart test` for dart packages based on a diff from origin/main
+
+  difftest:report:
+    run: |
+      melos exec --since="origin/main" --fail-fast --file-exists="./tests.json" -- \
+       "tojunit -i tests.json -o test-report.xml"
+    description: Convert the test report based on a diff from origin/main
+
+  difftest:
+    run: |
+      melos run difftest:flutter && melos run difftest:dart && melos run difftest:report
+    description: Run all the tests based on a diff from origin/main
+
+  ## FULL TESTING
+
+  test:flutter:
+    run: |
+      melos exec --fail-fast  --dir-exists="test" --depends-on="flutter_test" --flutter -- \
+        "flutter test --no-pub --machine > tests.json"
+    description: Run `flutter test` for flutter packages.
+
+  test:dart:
+    run: |
+      melos exec --fail-fast --dir-exists="test"  --depends-on="test" --no-flutter -- \
+        "dart test --file-reporter=json:tests.json"
+    description: Run `dart test` for dart packages.
+
+  test:report:
+    run: |
+      melos exec --fail-fast --file-exists="./tests.json" -- \
+       "tojunit -i tests.json -o test-report.xml"
+    description: Convert the test report.
+
+  test:
+    run: |
+      melos run test:flutter && melos run test:dart && melos run test:report
+    description: Run all the tests.
+
+  ## COVERAGE DIFF FROM MAIN BRANCH
+
+  diffcoverage:flutter:
+    run: |
+      melos exec --since="origin/main" -c 1 --fail-fast --dir-exists="test" --depends-on="flutter_test" --flutter -- \
+        "flutter test --no-pub --machine --coverage --coverage-path="./coverage/\$MELOS_PACKAGE_NAME.lcov.info" > tests.json
+        sed -if 's/SF:/&MELOS_PACKAGE_NAME\//' ./coverage/\$MELOS_PACKAGE_NAME.lcov.info"
+    description: Generate Flutter package coverage report based on a diff from origin/main
+
+  diffcoverage:dart:
+    run: |
+      melos exec  --since="origin/main" -c 1 --fail-fast --dir-exists="test" --depends-on="test" --no-flutter -- \
+       "pub run test_coverage --print-test-output --no-badge --port 8997
+       mv coverage/lcov.info coverage/\$MELOS_PACKAGE_NAME.lcov.info
+       sed -if 's/SF:/&MELOS_PACKAGE_NAME\//' ./coverage/\$MELOS_PACKAGE_NAME.lcov.info"
+
+    description: Generate Dart package coverage report based on a diff from origin/main
+
+  diffcoverage:report:
+    run: |
+      sh coverage.sh
+
+    description: Generate the coverage report based on a diff from origin/main
+
+  diffcoverage:
+    run: |
+      melos run setupcoverage && melos run diffcoverage:flutter && melos run diffcoverage:dart && melos run diffcoverage:report && melos run difftest:dart && melos run difftest:report && melos run cleanupcoverage
+    description: Run all the tests based on a diff from origin/main.
+
+  ## FULL COVERAGE
+
+  coverage:flutter:
+    run: |
+      melos exec -c 1 --fail-fast --dir-exists="test" --depends-on="flutter_test" --flutter -- \
+        "flutter test --no-pub --machine --coverage --coverage-path="./coverage/\$MELOS_PACKAGE_NAME.lcov.info" > tests.json
+        sed -if 's/SF:/&MELOS_PACKAGE_NAME\//' ./coverage/\$MELOS_PACKAGE_NAME.lcov.info"
+    description: Generate full Flutter package coverage report
+
+
+  coverage:dart:
+    run: |
+      melos exec -c 1 --fail-fast --dir-exists="test" --depends-on="test" --no-flutter -- \
+       "pub run test_coverage --print-test-output --no-badge --port 8997
+       mv coverage/lcov.info coverage/\$MELOS_PACKAGE_NAME.lcov.info
+       sed -if 's/SF:/&MELOS_PACKAGE_NAME\//' ./coverage/\$MELOS_PACKAGE_NAME.lcov.info"
+
+    description: Generate Dart package coverage report
+
+  coverage:report:
+    run: |
+      sh coverage.sh
+
+    description: Generate the full coverage report
+
+  coverage:
+    run: |
+      melos run setupcoverage && melos run coverage:flutter && melos run coverage:dart && melos run coverage:report && melos run test:dart && melos run test:report && melos run cleanupcoverage
+    description: Run all the tests and generate the full coverage report.
+
+dev_dependencies:
+  pedantic: ^1.9.0

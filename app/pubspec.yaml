@@ -1,4 +1,4 @@
-name: flutter_mvvm
+name: app
 description: An example of MVVM in Flutter
 
 publish_to: 'none'
@@ -8,8 +8,30 @@ environment:
   sdk: ">=2.13.0 <3.0.0"
 
 dependencies:
+  logging: ^1.0.0
+  cupertino_icons: ^1.0.2
+  rxdart: ^0.27.3
+
   flutter:
     sdk: flutter
+
+  design_system:
+    path: ../design_system
+
+  common:
+    path: ../common
+
+  entities:
+    path: ../entities
+
+  domain:
+    path: ../domain
+
+  data:
+    path: ../data
+
+  clients:
+    path: ../clients
 
 dev_dependencies:
   flutter_test:

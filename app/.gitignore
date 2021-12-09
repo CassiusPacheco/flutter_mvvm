@@ -31,15 +31,6 @@
 .pub/
 /build/
 build
-coverage/
-**/ios/build/
-
-tests.json
-test-report.xml
-coverage_test.dart
-
-**/fastlane/report.xml
-**/fastlane/README.md
 
 # Web related
 lib/generated_plugin_registrant.dart
